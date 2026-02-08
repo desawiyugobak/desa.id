@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Database Desa Wiyugobak</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --rasta-red: #e52b50;
+            --rasta-yellow: #ffcc00;
+            --rasta-green: #009900;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+        .login-bg {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://i.ibb.co.com/gbJF6dGg/20220507-141923.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        .sidebar {
+            background: linear-gradient(to bottom, var(--rasta-red), #000);
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+        }
+        @media print {
+            .no-print { display: none; }
+            .print-area { display: block !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- Halaman Login -->
+    <div id="login-page" class="login-bg min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md text-center">
+            <img src="https://i.ibb.co.com/21DGH25Q/Lambang-Kabupaten-Mamberamo-Tengah.webp" alt="Logo" class="w-24 mx-auto mb-4">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">SISTEM DATA DESA</h1>
+            <p class="text-sm text-gray-600 mb-6">Desa Wiyugobak, Kab. Mamberamo Tengah</p>
+            
+            <div class="space-y-4">
+                <input type="text" id="username" placeholder="Username" class="w-full p-3 border rounded focus:ring-2 focus:ring-red-500 outline-none">
+                <input type="password" id="password" placeholder="Password" class="w-full p-3 border rounded focus:ring-2 focus:ring-red-500 outline-none">
+                <button onclick="handleLogin()" class="w-full bg-red-600 text-white font-bold py-3 rounded hover:bg-red-700 transition">MASUK</button>
+            </div>
+            
+            <div class="mt-6 text-xs text-gray-500">
+                <p>Kontak: 082142470302</p>
+                <p>Email: kobakmamispugu@gmail.com</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard (Hidden by default) -->
+    <div id="main-dashboard" class="hidden min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="sidebar w-full md:w-64 text-white p-6 no-print">
+            <div class="text-center mb-8">
+                <img src="https://i.ibb.co.com/21DGH25Q/Lambang-Kabupaten-Mamberamo-Tengah.webp" alt="Logo" class="w-16 mx-auto mb-2 bg-white p-1 rounded-full">
+                <h2 class="font-bold text-lg">WIYUGOBAK</h2>
+            </div>
+            <nav class="space-y-2">
+                <button onclick="showSection('home')" class="w-full text-left p-3 hover:bg-white/10 rounded flex items-center">🏠 Beranda</button>
+                <button onclick="showSection('penduduk')" class="w-full text-left p-3 hover:bg-white/10 rounded flex items-center">👥 Data Penduduk</button>
+                <button onclick="showSection('perangkat')" class="w-full text-left p-3 hover:bg-white/10 rounded flex items-center">👔 Perangkat Desa</button>
+                <button onclick="showSection('lmd')" class="w-full text-left p-3 hover:bg-white/10 rounded flex items-center">🏛️ Anggota LMD</button>
+                <button onclick="showSection('surat')" class="w-full text-left p-3 hover:bg-white/10 rounded flex items-center">📄 Administrasi Surat</button>
+                <button onclick="showSection('keuangan')" class="w-full text-left p-3 hover:bg-white/10 rounded flex items-center">💰 Laporan Keuangan</button>
+                <button onclick="showSection('pembangunan')" class="w-full text-left p-3 hover:bg-white/10 rounded flex items-center">🏗️ Pembangunan</button>
+                <hr class="border-white/20 my-4">
+                <button onclick="handleLogout()" class="w-full text-left p-3 bg-red-800 hover:bg-red-900 rounded flex items-center">🚪 Keluar</button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 md:p-8 bg-gray-50 overflow-y-auto">
+            
+            <!-- Section: Home -->
+            <section id="sec-home" class="space-y-6">
+                <div class="bg-white p-6 rounded-lg shadow border-l-8 border-green-600">
+                    <h2 class="text-2xl font-bold mb-4 text-green-700">Visi & Misi Desa Wiyugobak</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-bold text-red-600 underline">VISI</h3>
+                            <p class="italic">"Terwujudnya Desa Wiyugobak yang Mandiri, Sejahtera, dan Berbudaya melalui Tata Kelola Pemerintahan yang Transparan."</p>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-red-600 underline">MISI</h3>
+                            <ul class="list-decimal ml-4 text-sm">
+                                <li>Meningkatkan pelayanan publik berbasis teknologi.</li>
+                                <li>Membangun infrastruktur desa yang merata.</li>
+                                <li>Meningkatkan ekonomi kreatif masyarakat lokal.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="map-container shadow-lg border-2 border-white rounded-lg">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d64118.65866731612!2d139.2051997!3d-3.7015664!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x68159b264c3d82ff%3A0xcbb955defa6ed45!2sWiyugobak%2C%20Distrik%20Kobagma%2C%20Kabupaten%20Mamberamo%20Tengah%2C%20Papua%20Pegunungan!5e1!3m2!1sid!2sid!4v1770572048539!5m2!1sid!2sid" loading="lazy"></iframe>
+                </div>
+            </section>
+
+            <!-- Section: Penduduk -->
+            <section id="sec-penduduk" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Data Penduduk</h2>
+                    <button onclick="toggleModal('modal-penduduk')" class="bg-green-600 text-white px-4 py-2 rounded shadow">+ Tambah Penduduk</button>
+                </div>
+                <div class="bg-white rounded-lg shadow overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-100 uppercase text-xs">
+                            <tr>
+                                <th class="p-4">Foto</th>
+                                <th class="p-4">Nama / NIK</th>
+                                <th class="p-4">Alamat</th>
+                                <th class="p-4">Pekerjaan</th>
+                                <th class="p-4">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-penduduk">
+                            <!-- Data rows go here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section: Perangkat Desa -->
+            <section id="sec-perangkat" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Perangkat Desa</h2>
+                    <button onclick="toggleModal('modal-perangkat')" class="bg-blue-600 text-white px-4 py-2 rounded shadow">+ Tambah Perangkat</button>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6" id="list-perangkat">
+                    <!-- Cards for village officials -->
+                </div>
+            </section>
+
+            <!-- Section: LMD -->
+            <section id="sec-lmd" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Anggota LMD</h2>
+                    <button onclick="toggleModal('modal-lmd')" class="bg-yellow-600 text-white px-4 py-2 rounded shadow">+ Tambah Anggota LMD</button>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6" id="list-lmd">
+                    <!-- Cards for LMD members -->
+                </div>
+            </section>
+
+            <!-- Section: Surat -->
+            <section id="sec-surat" class="hidden space-y-6">
+                <h2 class="text-2xl font-bold">Administrasi Surat Desa</h2>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-white p-6 rounded shadow text-center">
+                        <h3 class="font-bold mb-4">Keterangan Usaha</h3>
+                        <button onclick="printSurat('Usaha')" class="bg-red-600 text-white px-4 py-2 rounded w-full">Cetak Surat</button>
+                    </div>
+                    <div class="bg-white p-6 rounded shadow text-center">
+                        <h3 class="font-bold mb-4">Keterangan Pindah</h3>
+                        <button onclick="printSurat('Pindah')" class="bg-red-600 text-white px-4 py-2 rounded w-full">Cetak Surat</button>
+                    </div>
+                    <div class="bg-white p-6 rounded shadow text-center">
+                        <h3 class="font-bold mb-4">Keterangan Tidak Mampu</h3>
+                        <button onclick="printSurat('Tidak Mampu')" class="bg-red-600 text-white px-4 py-2 rounded w-full">Cetak Surat</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Keuangan -->
+            <section id="sec-keuangan" class="hidden space-y-6">
+                <h2 class="text-2xl font-bold">Laporan Keuangan Desa</h2>
+                <div class="bg-white p-4 rounded shadow mb-4">
+                    <div class="flex gap-4 items-end">
+                        <div class="flex-1">
+                            <label class="block text-xs font-bold mb-1">Nama Penerima</label>
+                            <input type="text" id="keu-nama" class="w-full border p-2 rounded">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs font-bold mb-1">Jumlah (Rp)</label>
+                            <input type="number" id="keu-jumlah" class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1">Tahun (2026-2030)</label>
+                            <select id="keu-tahun" class="w-full border p-2 rounded">
+                                <option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option>
+                            </select>
+                        </div>
+                        <button onclick="saveKeuangan()" class="bg-green-600 text-white px-6 py-2 rounded shadow">Simpan Transaksi</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded shadow overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-100 font-bold uppercase text-xs">
+                            <tr>
+                                <th class="p-4">Tahun</th>
+                                <th class="p-4">Penerima</th>
+                                <th class="p-4">Jumlah (Rp)</th>
+                                <th class="p-4">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-keuangan"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section: Pembangunan -->
+            <section id="sec-pembangunan" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Laporan Pembangunan</h2>
+                    <button onclick="toggleModal('modal-pembangunan')" class="bg-purple-600 text-white px-4 py-2 rounded shadow">+ Input Kegiatan</button>
+                </div>
+                <div id="list-pembangunan" class="grid md:grid-cols-2 gap-6">
+                    <!-- Kegiatan rows -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Modal Penduduk -->
+    <div id="modal-penduduk" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white w-full max-w-2xl rounded-lg p-6 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4">Input Data Penduduk</h3>
+            <form onsubmit="savePenduduk(event)" class="grid md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <label>Foto Profil</label>
+                    <input type="file" id="p-foto" class="w-full border p-2 rounded" accept="image/*">
+                </div>
+                <div>
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="p-nama" class="w-full border p-2 rounded" required>
+                </div>
+                <div>
+                    <label>NIK</label>
+                    <input type="text" id="p-nik" class="w-full border p-2 rounded" required>
+                </div>
+                <div>
+                    <label>Jenis Kelamin</label>
+                    <select id="p-jk" class="w-full border p-2 rounded">
+                        <option>Laki-laki</option>
+                        <option>Perempuan</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Alamat</label>
+                    <input type="text" id="p-alamat" value="Wiyugobak" class="w-full border p-2 rounded">
+                </div>
+                <div>
+                    <label>Agama</label>
+                    <input type="text" id="p-agama" value="Kristen" class="w-full border p-2 rounded">
+                </div>
+                <div>
+                    <label>Status Perkawinan</label>
+                    <select id="p-status" class="w-full border p-2 rounded">
+                        <option>Kawin</option>
+                        <option>Belum Kawin</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Pekerjaan</label>
+                    <select id="p-pekerjaan" class="w-full border p-2 rounded">
+                        <option>Belum Bekerja</option>
+                        <option>PNS</option>
+                        <option>Pengurus Rumah Tangga</option>
+                        <option>Tani</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2 flex gap-2">
+                    <button type="submit" class="flex-1 bg-green-600 text-white py-2 rounded">Simpan</button>
+                    <button type="button" onclick="toggleModal('modal-penduduk')" class="flex-1 bg-gray-400 text-white py-2 rounded">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Perangkat/LMD Global -->
+    <div id="modal-perangkat" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-md rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">Tambah Perangkat Desa</h3>
+            <form onsubmit="savePerangkat(event, 'perangkat')" class="space-y-4">
+                <input type="file" id="off-foto" class="w-full border p-2" accept="image/*">
+                <input type="text" id="off-nama" placeholder="Nama Lengkap" class="w-full border p-2" required>
+                <input type="text" id="off-nik" placeholder="NIK" class="w-full border p-2" required>
+                <input type="text" id="off-jabatan" placeholder="Jabatan" class="w-full border p-2" required>
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded">Simpan</button>
+                    <button type="button" onclick="toggleModal('modal-perangkat')" class="flex-1 bg-gray-400 text-white py-2 rounded">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-lmd" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-md rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">Tambah Anggota LMD</h3>
+            <form onsubmit="savePerangkat(event, 'lmd')" class="space-y-4">
+                <input type="file" id="lmd-foto" class="w-full border p-2" accept="image/*">
+                <input type="text" id="lmd-nama" placeholder="Nama Lengkap" class="w-full border p-2" required>
+                <input type="text" id="lmd-nik" placeholder="NIK" class="w-full border p-2" required>
+                <input type="text" id="lmd-jabatan" placeholder="Jabatan" class="w-full border p-2" required>
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 bg-yellow-600 text-white py-2 rounded">Simpan</button>
+                    <button type="button" onclick="toggleModal('modal-lmd')" class="flex-1 bg-gray-400 text-white py-2 rounded">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Pembangunan -->
+    <div id="modal-pembangunan" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-md rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">Input Kegiatan Pembangunan</h3>
+            <form onsubmit="savePembangunan(event)" class="space-y-4">
+                <input type="text" id="dev-jenis" placeholder="Jenis Kegiatan" class="w-full border p-2" required>
+                <textarea id="dev-keterangan" placeholder="Keterangan Dokumen" class="w-full border p-2 h-24"></textarea>
+                <input type="file" id="dev-foto" class="w-full border p-2" accept="image/*">
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 bg-purple-600 text-white py-2 rounded">Simpan</button>
+                    <button type="button" onclick="toggleModal('modal-pembangunan')" class="flex-1 bg-gray-400 text-white py-2 rounded">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- Print Preview Template (Hidden) -->
+<div id="print-template" class="hidden fixed inset-0 bg-white p-12 print-area">
+    <div class="text-center border-b-2 border-black pb-4 mb-6">
+        <img src="https://i.ibb.co.com/21DGH25Q/Lambang-Kabupaten-Mamberamo-Tengah.webp" alt="Logo" class="w-20 mx-auto mb-2">
+        <h1 class="text-xl font-bold uppercase">Pemerintah Kabupaten Mamberamo Tengah</h1>
+        <h2 class="text-lg font-bold uppercase">Distrik Kobakma - Desa Wiyugobak</h2>
+        <p class="text-sm">Alamat: Wiyugobak, Distrik Kobakma, Papua Pegunungan</p>
+    </div>
+    <div id="print-content" class="text-left space-y-6">
+        <!-- Content injected via JS -->
+    </div>
+    <div class="mt-20 flex justify-end">
+        <div class="text-center w-64">
+            <p>Wiyugobak, <span id="print-date"></span></p>
+            <p class="mb-20">Kepala Desa Wiyugobak,</p>
+            <p class="font-bold underline">(......................................)</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // State Management
+    let db = JSON.parse(localStorage.getItem('wiyugobak_db')) || {
+        penduduk: [],
+        perangkat: [],
+        lmd: [],
+        keuangan: [],
+        pembangunan: []
+    };
+
+    function saveDB() {
+        localStorage.setItem('wiyugobak_db', JSON.stringify(db));
+        renderAll();
+    }
+
+    // Auth Logic
+    function handleLogin() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        if(u && p) { // Basic login simulation
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('main-dashboard').classList.remove('hidden');
+            renderAll();
+        } else {
+            alert("Harap masukkan username dan password!");
+        }
+    }
+
+    function handleLogout() {
+        if(confirm("Apakah anda yakin ingin keluar?")) {
+            location.reload();
+        }
+    }
+
+    // UI Logic
+    function showSection(id) {
+        document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
+        document.getElementById('sec-' + id).classList.remove('hidden');
+    }
+
+    function toggleModal(id) {
+        document.getElementById(id).classList.toggle('hidden');
+    }
+
+    // File to Base64
+    async function getBase64(file) {
+        if (!file) return 'https://via.placeholder.com/150';
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // --- Data Penduduk ---
+    async function savePenduduk(e) {
+        e.preventDefault();
+        const foto = await getBase64(document.getElementById('p-foto').files[0]);
+        const data = {
+            id: Date.now(),
+            foto,
+            nama: document.getElementById('p-nama').value,
+            nik: document.getElementById('p-nik').value,
+            jk: document.getElementById('p-jk').value,
+            alamat: document.getElementById('p-alamat').value,
+            agama: document.getElementById('p-agama').value,
+            status: document.getElementById('p-status').value,
+            pekerjaan: document.getElementById('p-pekerjaan').value,
+            kewarganegaraan: "INDONESIA",
+            berlaku: "Seumur Hidup"
+        };
+        db.penduduk.push(data);
+        saveDB();
+        toggleModal('modal-penduduk');
+        e.target.reset();
+    }
+
+    function deleteItem(type, id) {
+        if(confirm("Hapus data ini?")) {
+            db[type] = db[type].filter(item => item.id !== id);
+            saveDB();
+        }
+    }
+
+    // --- Data Perangkat & LMD ---
+    async function savePerangkat(e, type) {
+        e.preventDefault();
+        const prefix = type === 'perangkat' ? 'off-' : 'lmd-';
+        const foto = await getBase64(document.getElementById(prefix + 'foto').files[0]);
+        const data = {
+            id: Date.now(),
+            foto,
+            nama: document.getElementById(prefix + 'nama').value,
+            nik: document.getElementById(prefix + 'nik').value,
+            jabatan: document.getElementById(prefix + 'jabatan').value
+        };
+        db[type].push(data);
+        saveDB();
+        toggleModal('modal-' + type);
+        e.target.reset();
+    }
+
+    // --- Keuangan ---
+    function saveKeuangan() {
+        const nama = document.getElementById('keu-nama').value;
+        const jumlah = document.getElementById('keu-jumlah').value;
+        const tahun = document.getElementById('keu-tahun').value;
+        if(!nama || !jumlah) return alert("Isi data keuangan!");
+        
+        db.keuangan.push({ id: Date.now(), nama, jumlah, tahun });
+        saveDB();
+        document.getElementById('keu-nama').value = '';
+        document.getElementById('keu-jumlah').value = '';
+    }
+
+    // --- Pembangunan ---
+    async function savePembangunan(e) {
+        e.preventDefault();
+        const foto = await getBase64(document.getElementById('dev-foto').files[0]);
+        const data = {
+            id: Date.now(),
+            jenis: document.getElementById('dev-jenis').value,
+            keterangan: document.getElementById('dev-keterangan').value,
+            foto
+        };
+        db.pembangunan.push(data);
+        saveDB();
+        toggleModal('modal-pembangunan');
+        e.target.reset();
+    }
+
+    // --- Render Tables & Cards ---
+    function renderAll() {
+        // Render Penduduk
+        const listPenduduk = document.getElementById('list-penduduk');
+        listPenduduk.innerHTML = db.penduduk.map(p => `
+            <tr class="border-b hover:bg-gray-50">
+                <td class="p-4"><img src="${p.foto}" class="w-12 h-12 rounded-full object-cover"></td>
+                <td class="p-4"><b>${p.nama}</b><br><span class="text-xs text-gray-500">${p.nik}</span></td>
+                <td class="p-4">${p.alamat}</td>
+                <td class="p-4 font-semibold text-red-600">${p.pekerjaan}</td>
+                <td class="p-4">
+                    <button onclick="deleteItem('penduduk', ${p.id})" class="text-red-600 hover:underline">Hapus</button>
+                </td>
+            </tr>
+        `).join('');
+
+        // Render Perangkat
+        const listPerangkat = document.getElementById('list-perangkat');
+        listPerangkat.innerHTML = db.perangkat.map(p => `
+            <div class="bg-white p-4 rounded-lg shadow text-center relative border-t-4 border-blue-500">
+                <img src="${p.foto}" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+                <h4 class="font-bold">${p.nama}</h4>
+                <p class="text-xs text-blue-600 font-bold">${p.jabatan}</p>
+                <p class="text-xs text-gray-500 mb-4">${p.nik}</p>
+                <button onclick="deleteItem('perangkat', ${p.id})" class="text-xs text-red-500">Hapus</button>
+            </div>
+        `).join('');
+
+        // Render LMD
+        const listLmd = document.getElementById('list-lmd');
+        listLmd.innerHTML = db.lmd.map(p => `
+            <div class="bg-white p-4 rounded-lg shadow text-center relative border-t-4 border-yellow-500">
+                <img src="${p.foto}" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+                <h4 class="font-bold">${p.nama}</h4>
+                <p class="text-xs text-yellow-600 font-bold">${p.jabatan}</p>
+                <p class="text-xs text-gray-500 mb-4">${p.nik}</p>
+                <button onclick="deleteItem('lmd', ${p.id})" class="text-xs text-red-500">Hapus</button>
+            </div>
+        `).join('');
+
+        // Render Keuangan
+        const listKeuangan = document.getElementById('list-keuangan');
+        listKeuangan.innerHTML = db.keuangan.map(k => `
+            <tr class="border-b">
+                <td class="p-4">${k.tahun}</td>
+                <td class="p-4">${k.nama}</td>
+                <td class="p-4 font-mono">Rp ${Number(k.jumlah).toLocaleString()}</td>
+                <td class="p-4">
+                    <button onclick="deleteItem('keuangan', ${k.id})" class="text-red-500">Hapus</button>
+                </td>
+            </tr>
+        `).join('');
+
+        // Render Pembangunan
+        const listDev = document.getElementById('list-pembangunan');
+        listDev.innerHTML = db.pembangunan.map(d => `
+            <div class="bg-white p-4 rounded-lg shadow flex gap-4">
+                <img src="${d.foto}" class="w-32 h-32 object-cover rounded shadow">
+                <div class="flex-1">
+                    <h4 class="font-bold text-lg">${d.jenis}</h4>
+                    <p class="text-sm text-gray-600 mb-2">${d.keterangan}</p>
+                    <button onclick="deleteItem('pembangunan', ${d.id})" class="text-xs text-red-500">Hapus Kegiatan</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // --- Surat Logic ---
+    function printSurat(jenis) {
+        if (db.penduduk.length === 0) return alert("Data penduduk masih kosong!");
+        const p = db.penduduk[0]; // Ambil data pertama sebagai sampel
+        const content = document.getElementById('print-content');
+        const now = new Date();
+        document.getElementById('print-date').innerText = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        let specificText = "";
+        if(jenis === 'Usaha') {
+            specificText = `Menerangkan bahwa Bapak/Ibu <b>${p.nama}</b> memiliki Usaha yang aktif di Desa Wiyugobak.`;
+        } else if(jenis === 'Pindah') {
+            specificText = `Menerangkan bahwa Bapak/Ibu <b>${p.nama}</b> terdaftar sebagai warga kami dan bermaksud untuk pindah alamat sesuai dengan prosedur yang berlaku.`;
+        } else {
+            specificText = `Menerangkan bahwa Bapak/Ibu <b>${p.nama}</b> adalah benar warga Desa Wiyugobak yang tergolong Keluarga Tidak Mampu.`;
+        }
+
+        content.innerHTML = `
+            <h3 class="text-center font-bold text-xl underline mb-8">SURAT KETERANGAN ${jenis.toUpperCase()}</h3>
+            <p>Yang bertanda tangan di bawah ini Kepala Desa Wiyugobak, Distrik Kobakma, Kabupaten Mamberamo Tengah, menerangkan bahwa:</p>
+            <div class="ml-8 space-y-2">
+                <p>Nama : ${p.nama}</p>
+                <p>NIK : ${p.nik}</p>
+                <p>Jenis Kelamin : ${p.jk}</p>
+                <p>Alamat : ${p.alamat}</p>
+                <p>Agama : ${p.agama}</p>
+                <p>Pekerjaan : ${p.pekerjaan}</p>
+            </div>
+            <p>${specificText}</p>
+            <p>Demikian surat keterangan ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
+        `;
+
+        const originalDisplay = document.getElementById('app').style.display;
+        document.getElementById('app').classList.add('no-print');
+        document.getElementById('print-template').classList.remove('hidden');
+        window.print();
+        document.getElementById('app').classList.remove('no-print');
+        document.getElementById('print-template').classList.add('hidden');
+    }
+
+    // Init
+    window.onload = () => {
+        // Start on login page
+    };
+</script>
+
+</body>
+</html>
